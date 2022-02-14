@@ -1,0 +1,12 @@
+{
+  "users": {
+    "a": {
+      "name": "随便啥名",
+      "password": "123",
+      "time": 0,
+      "date": 1,
+      "sessionActive": true
+    }
+  },
+  "listings": {}
+}
