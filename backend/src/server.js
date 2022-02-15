@@ -15,6 +15,7 @@ import {
   updateListing,
   removeListing,
   getTimeValue,
+  getMonthValue
 } from './service';
 
 const app = express();
@@ -53,7 +54,8 @@ app.post(
     const { email, password } = req.body;
     const token = await login(email, password);
     const timeV = await getTimeValue(email);
-    return res.json({ token, timeV });
+    const month = await getMonthValue(email);
+    return res.json({ token, timeV, month });
   }),
 );
 

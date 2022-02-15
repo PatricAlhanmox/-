@@ -150,6 +150,11 @@ resourceLock((resolve, reject) => {
   resolve(users[email].time);
 });
 
+export const getMonthValue = (email) => 
+resourceLock((resolve, reject) => {
+  resolve(users[email].date);
+});
+
 export const getAllListings = () =>
   resourceLock((resolve, reject) => {
     resolve(

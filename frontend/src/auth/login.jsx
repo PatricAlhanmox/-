@@ -34,6 +34,7 @@ function userLogin () {
           const token = res.token;
           localStorage.setItem('token', token);
           localStorage.setItem('time', res.timeV);
+          localStorage.setItem('month', res.month);
           window.location = './listings';
         })
       } else if (response.status === 400 || response.status === 403) {

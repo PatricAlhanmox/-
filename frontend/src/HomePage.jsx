@@ -33,14 +33,23 @@ LinearProgressWithLabel.propTypes = {
   value: numbersFun,
 };
 
+function checkMonth () {
+  const myd = new Date();
+  const currentMonth = myd.getMonth();
+  if (currentMonth > localStorage.getItem('month')) {
+    return currentMonth;
+  } else {
+    return 0;
+  }
+}
+
 function HomePage () {
   const [, setPage] = React.useState('Home');
   const [precentage, setPercentage] = React.useState(0);
-  const [time, setTime] = React.useState(localStorage.getItem('time'));
+  const [time, setTime] = React.useState(localStorage.time);
+  const [month, setMonth] = React.useState(0);
   function handleHomePage (event) {
     event.preventDefault();
-    const myDate = new Date();
-    console.log(myDate.getMonth())
     const requestBag = {
       method: 'PUT',
       headers: {
@@ -49,13 +58,15 @@ function HomePage () {
       },
       body: JSON.stringify({
         time: event.target.time.value,
-        date: myDate.getMonth() + 1
+        date: month
       })
     }
     fetch(`${urlPath}/listings`, requestBag).then(response => {
       if (response.status === 200) {
         response.json().then(res => {
           setTime(res.timeValue);
+          console.log(`timeValue is ${res.timeValue}`);
+          localStorage.time = time;
           console.log(`timeValue is ${time}`);
         })
       } else if (response.status === 400 || response.status === 403) {
@@ -66,8 +77,9 @@ function HomePage () {
     })
   }
   React.useEffect(() => {
-    setPercentage((time / 35) * 100);
-  }, []);
+    setMonth(checkMonth());
+    setPercentage((time % 35) / 35 * 100);
+  }, [time]);
   return (
     <>
       <Container component="main" sx={{ display: 'flex' }}>
