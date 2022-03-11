@@ -12,10 +12,14 @@ import {
   logout,
   register,
   save,
-  updateListing,
+  listingLength,
+  addPilot,
+  getAllListings,
+  assertOwnsListing,
+  updateIncrementListing,
+  updateDecrementListing,
   removeListing,
   getTimeValue,
-  getMonthValue
 } from './service';
 
 const app = express();
@@ -51,11 +55,10 @@ const authed = (fn) => async (req, res) => {
 app.post(
   '/user/auth/login',
   catchErrors(async (req, res) => {
-    const { email, password } = req.body;
-    const token = await login(email, password);
+    const { email, password, currMonth } = req.body;
+    const token = await login(email, password, currMonth);
     const timeV = await getTimeValue(email);
-    const month = await getMonthValue(email);
-    return res.json({ token, timeV, month });
+    return res.json({ token, timeV });
   }),
 );
 
@@ -79,53 +82,66 @@ app.post(
 );
 
 /***************************************************************
-                       Homepage Functions
+                       Listing Functions
 ***************************************************************/
-
-app.put(
-  '/listings',
+app.post(
+  '/listings/new',
   catchErrors(
     authed(async (req, res, email) => {
-      const { time, date } = req.body;
-      return res.status(200).send({
-        timeValue: await updateListing(email, time, date),
-      });
-    }),
-  ),
-);
-
-app.get(
-  '/listings',
-  catchErrors(
-    authed(async (req, res, email) => {
-      return res.status(200).json({ 
-        listing: await getTimeValue(email),
+      const { name, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail } = req.body;
+      return res.status(200).json({
+        listingId: await addPilot(name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail),
+        listingLen: await listingLength(),
       });
     }),
   ),
 );
 
 app.put(
-  '/listings/:listingid',
+  '/listings/eddit/:listingid',
   catchErrors(
     authed(async (req, res, email) => {
       const { listingid } = req.params;
-      const { title, address, thumbnail, price, metadata } = req.body;
+      const { time, symbol } = req.body;
       await assertOwnsListing(email, listingid);
-      await updateListing(listingid, title, address, thumbnail, price, metadata);
+      if (symbol === '+') {
+        await updateIncrementListing(listingid, time, email);
+      } else {
+        await updateDecrementListing(listingid, time, email);
+      }
       return res.status(200).send({});
     }),
   ),
 );
 
 app.delete(
-  '/listings/:listingid',
+  '/listings/remove/:listingid',
   catchErrors(
     authed(async (req, res, email) => {
       const { listingid } = req.params;
       await assertOwnsListing(email, listingid);
       await removeListing(listingid);
       return res.status(200).send({});
+    }),
+  ),
+);
+/***************************************************************
+                       Homepage Functions
+***************************************************************/
+app.get(
+  '/listings',
+  catchErrors(async (req, res) => {
+    return res.json({ listings: await getAllListings() });
+  }),
+);
+
+app.get(
+  '/listings/getTimeValue',
+  catchErrors(
+    authed(async (req, res, email) => {
+      return res.status(200).json({ 
+        listing: await getTimeValue(email),
+      });
     }),
   ),
 );

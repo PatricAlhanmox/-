@@ -18,6 +18,7 @@ function userLogin () {
   }
   function handleLogin (event) {
     event.preventDefault();
+    const myDate = new Date();
     const requestBag = {
       method: 'POST',
       headers: {
@@ -26,6 +27,7 @@ function userLogin () {
       body: JSON.stringify({
         email: event.target.email.value,
         password: event.target.password.value,
+        currMonth: myDate.getMonth() + 1
       })
     };
     fetch(`${urlPath}/user/auth/login`, requestBag).then(response => {
@@ -33,9 +35,7 @@ function userLogin () {
         response.json().then(res => {
           const token = res.token;
           localStorage.setItem('token', token);
-          localStorage.setItem('time', res.timeV);
-          localStorage.setItem('month', res.month);
-          window.location = './listings';
+          window.location = '../../listings';
         })
       } else if (response.status === 400 || response.status === 403) {
         response.json().then(res => {

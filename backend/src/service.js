@@ -2,6 +2,7 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import AsyncLock from 'async-lock';
 import { InputError, AccessError } from './error';
+import { resolve } from 'path';
 
 const lock = new AsyncLock();
 
@@ -92,9 +93,17 @@ export const getEmailFromAuthorization = (authorization) => {
 
 export const login = (email, password) =>
   resourceLock((resolve, reject) => {
+    const d = new Date();
+    const cMonth = d.getMonth() + 1;
     if (email in users) {
       if (users[email].password === password) {
         users[email].sessionActive = true;
+        if (cMonth > users[email].currentMonth) {
+          listings.map((listing, idx) => {
+            listing.monthlyTime = 0;
+          })
+          users[email].currentMonth = cMonth;
+        }
         resolve(jwt.sign({ email }, JWT_SECRET, { algorithm: 'HS256' }));
       }
     }
@@ -107,7 +116,7 @@ export const logout = (email) =>
     resolve();
   });
 
-export const register = (email, password, name, time, date) =>
+export const register = (email, password, name, time, currentMonth) =>
   resourceLock((resolve, reject) => {
     if (email in users) {
       reject(new InputError('Email address already registered'));
@@ -116,7 +125,7 @@ export const register = (email, password, name, time, date) =>
       name,
       password,
       time,
-      date,
+      currentMonth,
       sessionActive: true,
     };
     const token = jwt.sign({ email }, JWT_SECRET, { algorithm: 'HS256' });
@@ -127,32 +136,49 @@ export const register = (email, password, name, time, date) =>
                        Listing Functions
 ***************************************************************/
 
-const newListingPayload = (time, owner) => ({
-  time,
-  owner,
+const newListingPayload = (name, leader, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail) => ({
+  name,
+  leader,
+  patternNumber,
+  monthlyTime,
+  quaterTime: [0, 0, 0, 0],
+  yearlyTime,
+  thumbnail
 });
 
-export const addTime = (time, email) => 
-resourceLock((resolve, reject) => {
-  if (time === undefined) {
-    reject(new InputError('Must provide a time for new listing'));
-  } else if (Object.keys(listings).find((key) => listings[key].time === time) !== undefined) {
-    reject(new InputError('A listing with this time already exists'));
-  } else {
-    const id = newListingId();
-    listings[id] = newListingPayload(time, email);
-    resolve(id);
-  }
-});
+export const listingLength = () => 
+  resourceLock((resolve, reject) => {
+    resolve(
+      Object.keys(listings).length
+    );
+  })
+
+export const addPilot = (name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail) =>
+  resourceLock((resolve, reject) => {
+    if (name === undefined) {
+      reject(new InputError('Must provide a name for new listing'));
+    } else if (Object.keys(listings).find((key) => listings[key].name === name) !== undefined) {
+      reject(new InputError('A listing with this name already exists'));
+    } else if (patternNumber === undefined) {
+      reject(new InputError('Must provide an patternNumber for new listing'));
+    } else if (monthlyTime === undefined || isNaN(monthlyTime)) {
+      reject(new InputError('Must provide a valid monthlyTime for new listing'));
+    } else if (thumbnail === undefined) {
+      reject(new InputError('Must provide a thumbnail for new listing'));
+    } else if (yearlyTime === undefined) {
+      reject(new InputError('Must provide yearlyTime details'));
+    } else {
+      const id = newListingId();
+      listings[id] = newListingPayload(name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail);
+      listings[id].quaterTime[Math.ceil(users[email].currentMonth / 3)] = quaterTime;
+
+      resolve(id);
+    }
+  });
 
 export const getTimeValue = (email) => 
 resourceLock((resolve, reject) => {
   resolve(users[email].time);
-});
-
-export const getMonthValue = (email) => 
-resourceLock((resolve, reject) => {
-  resolve(users[email].date);
 });
 
 export const getAllListings = () =>
@@ -160,23 +186,42 @@ export const getAllListings = () =>
     resolve(
       Object.keys(listings).map((key) => ({
         id: parseInt(key, 10),
-        time: listings[key].time,
+        name: listings[key].name,
+        leader: listings[key].leader,
+        patternNumber: listings[key].patternNumber,
+        monthlyTime: listings[key].monthlyTime,
+        quaterTime: listings[key].quaterTime,
+        yearlyTime: listings[key].yearlyTime,
         thumbnail: listings[key].thumbnail,
-        reviews: listings[key].reviews,
       })),
     );
   });
 
-export const updateListing = (email, time, date) =>
+export const assertOwnsListing = (email, listingId) =>
   resourceLock((resolve, reject) => {
-    if (email in users) {
-      users[email].time = parseInt(time) + parseInt(users[email].time);
-      users[email].date = date;
+    if (!(listingId in listings)) {
+      reject(new InputError('Invalid listing ID'));
+    } else if (listings[listingId].leader !== email) {
+      reject(new InputError('User does not own this Listing'));
     } else {
-      reject(new AccessError('no such user'));
+      resolve();
     }
-    const timeValue = users[email].time;
-    resolve(timeValue);
+  });
+
+export const updateIncrementListing = (listingId, time, email) =>
+  resourceLock((resolve, reject) => {
+    listings[listingId].monthlyTime = parseInt(time) + parseInt(listings[listingId].monthlyTime);
+    listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(time) + parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]);
+    listings[listingId].yearlyTime = parseInt(time) + parseInt(listings[listingId].yearlyTime);
+    resolve();
+  });
+  
+export const updateDecrementListing = (listingId, time) =>
+  resourceLock((resolve, reject) => {
+    listings[listingId].monthlyTime = parseInt(listings[listingId].monthlyTime) - parseInt(time);
+    listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]) - parseInt(time);
+    listings[listingId].yearlyTime = parseInt(listings[listingId].yearlyTime) - parseInt(time);
+    resolve();
   });
 
 export const removeListing = (listingId) =>

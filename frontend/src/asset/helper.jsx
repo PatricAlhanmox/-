@@ -1,4 +1,4 @@
-export function fileToDataUrl (file) {
+function fileToDataUrl (file) {
   const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
   const valid = validFileTypes.find(type => type === file.type);
   // Bad data, let's walk away.
@@ -15,3 +15,5 @@ export function fileToDataUrl (file) {
   reader.readAsDataURL(file);
   return dataUrlPromise;
 }
+
+export default fileToDataUrl;
