@@ -30,6 +30,7 @@ function edditPilot () {
       },
       body: JSON.stringify({
         time: event.target.dectime.value,
+        month: event.target.month.value,
         symbol: '-'
       })
     }
@@ -114,6 +115,13 @@ function edditPilot () {
     </Container>
     <Container component="main" sx={{ justifyContent: 'center' }}>
       <Box component="form" onSubmit={(event) => handleDecTime(event)} sx={{ width: '100%' }}>
+        <TextField
+          margin="normal"
+          id="month"
+          label="输入月份数字"
+          name="mon"
+          autoFocus
+        />
         <TextField
           margin="normal"
           id="dectime"

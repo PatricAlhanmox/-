@@ -105,9 +105,9 @@ app.put(
       const { time, month, symbol } = req.body;
       await assertOwnsListing(email, listingid);
       if (symbol === '+') {
-        await updateIncrementListing(listingid, time, month, email);
+        await updateIncrementListing(listingid, time, month);
       } else {
-        await updateDecrementListing(listingid, time, email);
+        await updateDecrementListing(listingid, time, month);
       }
       return res.status(200).send({});
     }),

@@ -227,19 +227,19 @@ export const assertOwnsListing = (email, listingId) =>
     }
   });
 
-export const updateIncrementListing = (listingId, time, m, email) =>
+export const updateIncrementListing = (listingId, time, m) =>
   resourceLock((resolve, reject) => {
-    listings[listingId].monthlyTime[m] = parseInt(time) + parseInt(listings[listingId].monthlyTime[m]);
-    listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(time) + parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]);
-    listings[listingId].yearlyTime = parseInt(time) + parseInt(listings[listingId].yearlyTime);
+    listings[listingId].monthlyTime[m] += parseInt(time);
+    listings[listingId].quaterTime[(Math.ceil(parseInt(m) / 3)).toString()] += parseInt(time);
+    listings[listingId].yearlyTime += parseInt(time);
     resolve();
   });
   
-export const updateDecrementListing = (listingId, time, email) =>
+export const updateDecrementListing = (listingId, time, m) =>
   resourceLock((resolve, reject) => {
-    listings[listingId].monthlyTime[users[email].currentMonth-1] = parseInt(listings[listingId].monthlyTime[users[email].currentMonth-1]) - parseInt(time);
-    listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]) - parseInt(time);
-    listings[listingId].yearlyTime = parseInt(listings[listingId].yearlyTime) - parseInt(time);
+    listings[listingId].monthlyTime[m] -= parseInt(time);
+    listings[listingId].quaterTime[(Math.ceil(parseInt(m) / 3)).toString()] -= parseInt(time);
+    listings[listingId].yearlyTime -= parseInt(time);
     resolve();
   });
 

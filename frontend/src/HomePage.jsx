@@ -3,12 +3,17 @@ import { Container, Button, Box, Typography, Toolbar } from '@material-ui/core';
 import LinearProgress from '@mui/material/LinearProgress';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
+import AirplanemodeActiveIcon from '@material-ui/icons/AirplanemodeActive';
 import logOut from './auth/logout';
 
 const urlPath = 'http://localhost:5005';
 
 function jumpToAddPilot () {
   window.location = '/listings/new';
+}
+
+function jumpToConvertData () {
+  window.location = '/listings/convert';
 }
 
 function removeDuplicate () {
@@ -75,7 +80,7 @@ function HomePage () {
   const [localLen, setLocalLen] = React.useState(0);
   const curDate = new Date();
   const curSeason = Math.ceil(curDate.getMonth() / 3);
-  const curMonth = parseInt(curDate.getMonth());
+  const curMonth = parseInt(curDate.getMonth()) + 1;
   const requestBag = {
     method: 'GET',
     headers: {
@@ -105,6 +110,9 @@ function HomePage () {
         </form>
         <Button onClick={() => jumpToAddPilot()}>
           <AirlineSeatReclineNormalIcon fontSize='large' color='primary'/><Typography component="p">点此增加飞行员</Typography>
+        </Button>
+        <Button onClick={() => jumpToConvertData()}>
+          <AirplanemodeActiveIcon fontSize='large' color='primary'/><Typography component="p">点此导出飞行数据</Typography>
         </Button>
       </Toolbar>
     </Container>
