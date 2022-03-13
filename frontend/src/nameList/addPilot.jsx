@@ -33,7 +33,7 @@ function addPilot () {
           response.json().then(res => {
             const listId = res.listingId;
             const idNext = res.listingLen;
-            localStorage.setItem(`id${idNext}`, listId);
+            localStorage.setItem(`${idNext}`, listId);
             window.location = '../';
           })
         } else if (response.status === 400 || response.status === 403) {

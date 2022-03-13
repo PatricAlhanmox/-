@@ -11,24 +11,39 @@ function jumpToAddPilot () {
   window.location = '/listings/new';
 }
 
-function sortPilot () {
-  let tmp = 0;
+function removeDuplicate () {
   for (let i = 0; i < localStorage.length; i++) {
-    const curKey = localStorage.key(i);
-    if (curKey[0] === 'i' && curKey[1] === 'd' && curKey[2] !== 'x') {
-      for (let j = 1; j < localStorage.length; j++) {
-        const innerCurKey = localStorage.key(j);
-        if (innerCurKey[0] === 'i' && innerCurKey[1] === 'd' && innerCurKey[2] !== 'x') {
-          if (localStorage.getItem(innerCurKey) > localStorage.getItem(curKey)) {
-            console.log('here');
-            tmp = localStorage.getItem(innerCurKey);
-            const smaller = localStorage.getItem(curKey);
-            localStorage.setItem(curKey, tmp);
-            localStorage.setItem(innerCurKey, smaller);
-          }
+    for (let j = i + 1; j < localStorage.length; j++) {
+      if (localStorage.key(i) !== 'token') {
+        if (localStorage.getItem(localStorage.key(i)) === localStorage.getItem(localStorage.key(j))) {
+          localStorage.removeItem(localStorage.key(j));
         }
       }
     }
+  }
+}
+
+function sortPilot () {
+  const arrNum = [];
+  let j = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    if (localStorage.key(i) !== 'token') {
+      arrNum[j] = parseInt(localStorage.getItem(localStorage.key(i)));
+      j++;
+    }
+  }
+  let swap = 0;
+  for (let m = 0; m < arrNum.length; m++) {
+    for (let n = 0; n < arrNum.length; n++) {
+      if (arrNum[m] < arrNum[n]) {
+        swap = arrNum[m];
+        arrNum[m] = arrNum[n];
+        arrNum[n] = swap;
+      }
+    }
+  }
+  for (let k = 0; k < arrNum.length; k++) {
+    localStorage.setItem(k + 1, arrNum[k]);
   }
 }
 
@@ -57,8 +72,10 @@ LinearProgressWithLabel.propTypes = {
 
 function HomePage () {
   const [listings, setlistings] = React.useState([]);
+  const [localLen, setLocalLen] = React.useState(0);
   const curDate = new Date();
   const curSeason = Math.ceil(curDate.getMonth() / 3);
+  const curMonth = parseInt(curDate.getMonth());
   const requestBag = {
     method: 'GET',
     headers: {
@@ -70,8 +87,11 @@ function HomePage () {
       .then(r => r.json())
       .then((data) => {
         setlistings(data.listings);
+        setLocalLen(localStorage.length);
+        sortPilot();
+        removeDuplicate();
       })
-  }, []);
+  }, [localLen]);
   return <>
     <Container component="main" sx={{ display: 'flex' }}>
       <Toolbar sx={{ borderBottom: 1, display: 'flex', justifyContent: 'space-around', marginBottom: '2%' }}>
@@ -103,16 +123,16 @@ function HomePage () {
                   <Typography variant="body1">姓名: {listing.name}</Typography>
                   <Typography variant="body1">上级: {listing.leader}</Typography>
                   <Typography width="12%" variant="body1">月起落数: {listing.patternNumber}</Typography>
-                  <Typography width="12%" variant="body1">本月飞行小时: {listing.monthlyTime}</Typography>
+                  <Typography width="12%" variant="body1">本月飞行小时: {listing.monthlyTime[curMonth]}</Typography>
                   <Typography width="12%" variant="body1">本季飞行小时: {listing.quaterTime[curSeason]}</Typography>
                   <Typography width="12%" variant="body1">本年飞行小时: {listing.yearlyTime}</Typography>
                   <Box width="15%">
-                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { window.location = '/listings/eddit/'; sortPilot(); localStorage.setItem('idx', idx) }} >编辑</Button>
-                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { window.location = '/listings/remove/'; sortPilot(); localStorage.setItem('idx', idx) }} >删除</Button>
+                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/eddit/'; localStorage.setItem('idx', idx) }} >编辑</Button>
+                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/remove/'; localStorage.setItem('idx', idx) }} >删除</Button>
                   </Box>
                 </Box>
               </Box>
-              <LinearProgressWithLabel value={parseInt(listing.monthlyTime)} />
+              <LinearProgressWithLabel value={parseInt(listing.monthlyTime[curMonth])} />
             </Box>
             <div>
               <br />

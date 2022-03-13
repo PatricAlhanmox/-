@@ -10,12 +10,12 @@ function handleDeletion () {
     body: JSON.stringify({})
   }
   const item = parseInt(localStorage.getItem('idx')) + 1;
-  const listID = localStorage.getItem(`id${item}`);
+  const listID = localStorage.getItem(`${item}`);
   fetch(`${urlPath}/listings/remove/${listID}`, requestBag).then(r => {
     if (r.status === 200) {
       r.json().then(res => {
-        localStorage.removeItem(`id${item}`);
         localStorage.removeItem('idx');
+        localStorage.removeItem(`${item}`);
         alert('deleted successfully');
         window.location = '../';
       })

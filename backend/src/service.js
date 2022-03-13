@@ -140,8 +140,26 @@ const newListingPayload = (name, leader, patternNumber, monthlyTime, quaterTime,
   name,
   leader,
   patternNumber,
-  monthlyTime,
-  quaterTime: [0, 0, 0, 0],
+  monthlyTime: {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0
+  },
+  quaterTime: {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0
+  },
   yearlyTime,
   thumbnail
 });
@@ -170,7 +188,8 @@ export const addPilot = (name, email, patternNumber, monthlyTime, quaterTime, ye
     } else {
       const id = newListingId();
       listings[id] = newListingPayload(name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail);
-      listings[id].quaterTime[Math.ceil(users[email].currentMonth / 3)] = quaterTime;
+      listings[id].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(quaterTime);
+      listings[id].monthlyTime[users[email].currentMonth-1] = parseInt(monthlyTime);
 
       resolve(id);
     }
@@ -208,17 +227,17 @@ export const assertOwnsListing = (email, listingId) =>
     }
   });
 
-export const updateIncrementListing = (listingId, time, email) =>
+export const updateIncrementListing = (listingId, time, m, email) =>
   resourceLock((resolve, reject) => {
-    listings[listingId].monthlyTime = parseInt(time) + parseInt(listings[listingId].monthlyTime);
+    listings[listingId].monthlyTime[m] = parseInt(time) + parseInt(listings[listingId].monthlyTime[m]);
     listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(time) + parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]);
     listings[listingId].yearlyTime = parseInt(time) + parseInt(listings[listingId].yearlyTime);
     resolve();
   });
   
-export const updateDecrementListing = (listingId, time) =>
+export const updateDecrementListing = (listingId, time, email) =>
   resourceLock((resolve, reject) => {
-    listings[listingId].monthlyTime = parseInt(listings[listingId].monthlyTime) - parseInt(time);
+    listings[listingId].monthlyTime[users[email].currentMonth-1] = parseInt(listings[listingId].monthlyTime[users[email].currentMonth-1]) - parseInt(time);
     listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(listings[listingId].quaterTime[Math.ceil(users[email].currentMonth / 3)]) - parseInt(time);
     listings[listingId].yearlyTime = parseInt(listings[listingId].yearlyTime) - parseInt(time);
     resolve();

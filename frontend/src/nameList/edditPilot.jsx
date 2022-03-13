@@ -12,7 +12,7 @@ function removeID () {
   let removeID = '';
   for (let i = 0; i < localStorage.length; i++) {
     const tmpKey = localStorage.key(i);
-    if (tmpKey[0] === 'i' && tmpKey[1] === 'd' && tmpKey[2] === 'x') {
+    if (tmpKey === 'idx') {
       removeID = tmpKey
     }
   }
@@ -34,13 +34,12 @@ function edditPilot () {
       })
     }
     const item = parseInt(localStorage.getItem('idx')) + 1;
-    const listID = localStorage.getItem(`id${item}`);
+    const listID = localStorage.getItem(`${item}`);
     fetch(`${urlPath}/listings/eddit/${listID}`, requestBag).then(response => {
       if (response.status === 200) {
         response.json().then(res => {
-          const listId = res.listingId;
-          localStorage.setItem(`id${listId}`, listId);
-          localStorage.removeItem(`ID${listID}`);
+          alert('eddit success');
+          localStorage.removeItem('idx');
           window.location = '../';
         })
       } else if (response.status === 400 || response.status === 403) {
@@ -60,11 +59,12 @@ function edditPilot () {
       },
       body: JSON.stringify({
         time: event.target.time.value,
+        month: event.target.month.value,
         symbol: '+'
       })
     }
     const item = parseInt(localStorage.getItem('idx')) + 1;
-    const listID = localStorage.getItem(`id${item}`);
+    const listID = localStorage.getItem(`${item}`);
     fetch(`${urlPath}/listings/eddit/${listID}`, requestBag).then(response => {
       if (response.status === 200) {
         response.json().then(res => {
@@ -88,6 +88,13 @@ function edditPilot () {
       </form>
       <Typography variant="h3"> 更改飞行时间 </Typography>
       <Box component="form" onSubmit={(event) => handleAddTime(event)} sx={{ width: '100%' }}>
+        <TextField
+          margin="normal"
+          id="month"
+          label="输入月份数字"
+          name="mon"
+          autoFocus
+        />
         <TextField
           margin="normal"
           id="time"

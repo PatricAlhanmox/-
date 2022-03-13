@@ -102,10 +102,10 @@ app.put(
   catchErrors(
     authed(async (req, res, email) => {
       const { listingid } = req.params;
-      const { time, symbol } = req.body;
+      const { time, month, symbol } = req.body;
       await assertOwnsListing(email, listingid);
       if (symbol === '+') {
-        await updateIncrementListing(listingid, time, email);
+        await updateIncrementListing(listingid, time, month, email);
       } else {
         await updateDecrementListing(listingid, time, email);
       }
@@ -133,17 +133,6 @@ app.get(
   catchErrors(async (req, res) => {
     return res.json({ listings: await getAllListings() });
   }),
-);
-
-app.get(
-  '/listings/getTimeValue',
-  catchErrors(
-    authed(async (req, res, email) => {
-      return res.status(200).json({ 
-        listing: await getTimeValue(email),
-      });
-    }),
-  ),
 );
 
 
