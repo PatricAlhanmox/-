@@ -12,10 +12,6 @@ function jumpToAddPilot () {
   window.location = '/listings/new';
 }
 
-function jumpToConvertData () {
-  window.location = '/listings/convert';
-}
-
 function removeDuplicate () {
   for (let i = 0; i < localStorage.length; i++) {
     for (let j = i + 1; j < localStorage.length; j++) {
@@ -110,9 +106,6 @@ function HomePage () {
         </form>
         <Button onClick={() => jumpToAddPilot()}>
           <AirlineSeatReclineNormalIcon fontSize='large' color='primary'/><Typography component="p">点此增加飞行员</Typography>
-        </Button>
-        <Button onClick={() => jumpToConvertData()}>
-          <AirplanemodeActiveIcon fontSize='large' color='primary'/><Typography component="p">点此导出飞行数据</Typography>
         </Button>
       </Toolbar>
     </Container>
