@@ -3,7 +3,6 @@ import { Container, Button, Box, Typography, Toolbar } from '@material-ui/core';
 import LinearProgress from '@mui/material/LinearProgress';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
-import AirplanemodeActiveIcon from '@material-ui/icons/AirplanemodeActive';
 import logOut from './auth/logout';
 
 const urlPath = 'http://localhost:5005';

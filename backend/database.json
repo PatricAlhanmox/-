@@ -5,7 +5,7 @@
       "password": "1",
       "time": 0,
       "currentMonth": 3,
-      "sessionActive": true
+      "sessionActive": false
     }
   },
   "listings": {
