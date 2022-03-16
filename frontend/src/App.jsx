@@ -8,6 +8,7 @@ import userRegister from './auth/register';
 import addPilot from './nameList/addPilot';
 import edditPilot from './nameList/edditPilot';
 import handleDeletion from './nameList/removePilot';
+import pilotDetail from './nameList/detailPilot';
 
 function App () {
   return (
@@ -19,6 +20,7 @@ function App () {
           <Route exact path="/listings/new" component={addPilot} />
           <Route exact path="/listings/eddit" component={edditPilot} />
           <Route exact path="/listings/remove" component={handleDeletion} />
+          <Route exact path="/listings/detail" component={pilotDetail} />
           <Route exact path="/user/auth/register" component={userRegister} />
           <Route exact path="/user/auth/logout" component={logOut} />
         </Switch>

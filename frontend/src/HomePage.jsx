@@ -127,8 +127,9 @@ function HomePage () {
                   <Typography width="12%" variant="body1">本季飞行小时: {listing.quaterTime[curSeason]}</Typography>
                   <Typography width="12%" variant="body1">本年飞行小时: {listing.yearlyTime}</Typography>
                   <Box width="15%">
-                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/eddit/'; localStorage.setItem('idx', idx) }} >编辑</Button>
-                    <Button color='primary' border="5" size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/remove/'; localStorage.setItem('idx', idx) }} >删除</Button>
+                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/eddit/'; localStorage.setItem('idx', idx) }} >编辑</Button>
+                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/remove/'; localStorage.setItem('idx', idx) }} >删除</Button>
+                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/detail/'; localStorage.setItem('idx', idx) }} >细节</Button>
                   </Box>
                 </Box>
               </Box>
