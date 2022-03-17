@@ -136,10 +136,24 @@ export const register = (email, password, name, time, currentMonth) =>
                        Listing Functions
 ***************************************************************/
 
-const newListingPayload = (name, leader, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail) => ({
+const newListingPayload = (name, leader, patternNumber, goalTime, monthlyTime, quaterTime, yearlyTime, thumbnail) => ({
   name,
   leader,
   patternNumber,
+  goalTime: {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0
+  },
   monthlyTime: {
     "1": 0,
     "2": 0,
@@ -171,7 +185,7 @@ export const listingLength = () =>
     );
   })
 
-export const addPilot = (name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail) =>
+export const addPilot = (name, email, patternNumber, goalTime, monthlyTime, quaterTime, yearlyTime, thumbnail) =>
   resourceLock((resolve, reject) => {
     if (name === undefined) {
       reject(new InputError('Must provide a name for new listing'));
@@ -187,9 +201,10 @@ export const addPilot = (name, email, patternNumber, monthlyTime, quaterTime, ye
       reject(new InputError('Must provide yearlyTime details'));
     } else {
       const id = newListingId();
-      listings[id] = newListingPayload(name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail);
+      listings[id] = newListingPayload(name, email, patternNumber, goalTime, monthlyTime, quaterTime, yearlyTime, thumbnail);
       listings[id].quaterTime[Math.ceil(users[email].currentMonth / 3)] = parseInt(quaterTime);
       listings[id].monthlyTime[(users[email].currentMonth).toString()] = parseInt(monthlyTime);
+      listings[id].goalTime[(users[email].currentMonth).toString()] = parseInt(goalTime);
 
       resolve(id);
     }
@@ -208,6 +223,7 @@ export const getAllListings = () =>
         name: listings[key].name,
         leader: listings[key].leader,
         patternNumber: listings[key].patternNumber,
+        goalTime: listings[key].goalTime,
         monthlyTime: listings[key].monthlyTime,
         quaterTime: listings[key].quaterTime,
         yearlyTime: listings[key].yearlyTime,
@@ -242,6 +258,12 @@ export const updateDecrementListing = (listingId, time, m) =>
     listings[listingId].yearlyTime -= parseInt(time);
     resolve();
   });
+
+export const setGoalListing = (listingId, time, m) =>
+  resourceLock((resolve, reject) => {
+    listings[listingId].goalTime[m] = parseInt(time);
+    resolve();
+  })
 
 export const removeListing = (listingId) =>
   resourceLock((resolve, reject) => {

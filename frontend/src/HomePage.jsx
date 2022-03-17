@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Button, Box, Typography, Toolbar } from '@material-ui/core';
+import { Container, Button, Box, Typography, Toolbar, ButtonGroup } from '@material-ui/core';
 import LinearProgress from '@mui/material/LinearProgress';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
@@ -49,9 +49,9 @@ function sortPilot () {
 
 function LinearProgressWithLabel (props) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
-      <Box sx={{ width: '85%', mr: 1 }}>
-        <LinearProgress variant="determinate" color={ Math.round(props.value) >= 40 ? 'success' : 'secondary' } {...props} />
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'left', marginLeft: '2%' }}>
+      <Box sx={Math.round(props.value) > 100 ? { width: `${(Math.round(props.value) * 4 / 5).toString()}%`, mr: 1 } : { width: '80%', mr: 1 }}>
+        <LinearProgress variant="determinate" color={ Math.round(props.value) >= 100 ? 'success' : 'secondary' } {...props} />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography variant="body2" color="text.secondary">{`${Math.round(
@@ -74,7 +74,6 @@ function HomePage () {
   const [listings, setlistings] = React.useState([]);
   const [localLen, setLocalLen] = React.useState(0);
   const curDate = new Date();
-  const curSeason = Math.ceil(curDate.getMonth() / 3);
   const curMonth = parseInt(curDate.getMonth()) + 1;
   const requestBag = {
     method: 'GET',
@@ -113,27 +112,17 @@ function HomePage () {
         return (
           <Container component="main" maxWidth="lg" key={idx}>
             <Box sx = {{ border: '1px solid green' }}>
-              <Box sx = {{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: '1%' }}>
-                <Box sx = {{ display: 'flex', margin: '1%' }}>
-                  {
-                    listing.thumbnail === '' ? <Typography variant="body1">No pictures yet</Typography> : <Typography variant="body1"> <img src={ listing.thumbnail } /> </Typography>
-                  }
-                </Box>
-                <Box sx = {{ display: 'flex', justifyContent: 'space-between', marginLeft: '15%' }}>
-                  <Typography variant="body1">姓名: {listing.name}</Typography>
-                  <Typography variant="body1">上级: {listing.leader}</Typography>
-                  <Typography width="12%" variant="body1">月起落数: {listing.patternNumber}</Typography>
-                  <Typography width="12%" variant="body1">本月飞行小时: {listing.monthlyTime[curMonth]}</Typography>
-                  <Typography width="12%" variant="body1">本季飞行小时: {listing.quaterTime[curSeason]}</Typography>
-                  <Typography width="12%" variant="body1">本年飞行小时: {listing.yearlyTime}</Typography>
-                  <Box width="15%">
-                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/eddit/'; localStorage.setItem('idx', idx) }} >编辑</Button>
-                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/remove/'; localStorage.setItem('idx', idx) }} >删除</Button>
-                    <Button color='primary' size="medium" variant="contained" onClick={() => { sortPilot(); window.location = '/listings/detail/'; localStorage.setItem('idx', idx) }} >细节</Button>
-                  </Box>
+              <Box sx = {{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginLeft: '2%' }}>
+                <Box sx = {{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '80%' }}>
+                  <Typography flexDirection='column' variant="body1">姓名: {listing.name}</Typography>
+                  <ButtonGroup variant="contained" color="primary">
+                    <Button color='primary' size="large" onClick={() => { window.location = '/listings/eddit/'; localStorage.setItem('idx', idx) }} >编辑</Button>
+                    <Button color='primary' size="large" onClick={() => { window.location = '/listings/remove/'; localStorage.setItem('idx', idx) }} >删除</Button>
+                    <Button color='primary' size="large" onClick={() => { window.location = '/listings/detail/'; localStorage.setItem('idx', idx) }} >细节</Button>
+                  </ButtonGroup >
                 </Box>
               </Box>
-              <LinearProgressWithLabel value={parseInt(listing.monthlyTime[curMonth])} />
+              <LinearProgressWithLabel value={listing.monthlyTime[curMonth] / listing.goalTime[curMonth] * 100 } />
             </Box>
             <div>
               <br />

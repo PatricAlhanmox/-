@@ -21,6 +21,7 @@ function addPilot () {
         },
         body: JSON.stringify({
           name: event.target.name.value,
+          goalTime: event.target.goalTime.value,
           patternNumber: event.target.patternNumber.value,
           monthlyTime: event.target.monthlyTime.value,
           quaterTime: event.target.quaterTime.value,
@@ -28,6 +29,7 @@ function addPilot () {
           thumbnail: r
         })
       };
+      console.log(r);
       fetch(`${urlPath}/listings/new`, requestBag).then(response => {
         if (response.status === 200) {
           response.json().then(res => {
@@ -70,6 +72,13 @@ function addPilot () {
           id="patternNumber"
           label="本月起落数"
           name="Bathroom"
+          autoFocus
+        />
+        <TextField
+          margin="normal"
+          id="goalTime"
+          label="本月应飞小时数"
+          name="goalTime"
           autoFocus
         />
         <TextField

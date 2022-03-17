@@ -19,6 +19,7 @@ import {
   assertOwnsListing,
   updateIncrementListing,
   updateDecrementListing,
+  setGoalListing,
   removeListing,
   getTimeValue,
 } from './service';
@@ -89,9 +90,9 @@ app.post(
   '/listings/new',
   catchErrors(
     authed(async (req, res, email) => {
-      const { name, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail } = req.body;
+      const { name, patternNumber, goalTime, monthlyTime, quaterTime, yearlyTime, thumbnail } = req.body;
       return res.status(200).json({
-        listingId: await addPilot(name, email, patternNumber, monthlyTime, quaterTime, yearlyTime, thumbnail),
+        listingId: await addPilot(name, email, patternNumber, goalTime, monthlyTime, quaterTime, yearlyTime, thumbnail),
         listingLen: await listingLength(),
       });
     }),
@@ -107,8 +108,10 @@ app.put(
       await assertOwnsListing(email, listingid);
       if (symbol === '+') {
         await updateIncrementListing(listingid, time, month);
-      } else {
+      } else if (symbol === '-') {
         await updateDecrementListing(listingid, time, month);
+      } else {
+        await setGoalListing(listingid, time, month);
       }
       return res.status(200).send({});
     }),
@@ -137,7 +140,7 @@ app.get(
       });
     }),
   ),
-)
+);
 /***************************************************************
                        Homepage Functions
 ***************************************************************/
